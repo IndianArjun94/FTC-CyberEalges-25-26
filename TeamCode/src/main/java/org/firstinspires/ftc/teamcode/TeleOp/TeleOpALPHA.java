@@ -45,8 +45,6 @@ public class TeleOpALPHA extends OpMode {
         leftBackMotor.setPower(leftBackSpeed * DRIVETRAIN_MULTIPLIER);
         rightBackMotor.setPower(rightBackSpeed * DRIVETRAIN_MULTIPLIER);
         rightFrontMotor.setPower(rightFrontSpeed * DRIVETRAIN_MULTIPLIER);
-        isArmLocked = false;
-        isArmRising = false;
     }
 
     @Override
