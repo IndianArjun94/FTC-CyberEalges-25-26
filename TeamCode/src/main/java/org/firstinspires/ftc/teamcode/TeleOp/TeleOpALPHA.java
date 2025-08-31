@@ -21,8 +21,8 @@ public class TeleOpALPHA extends OpMode {
 
     private final static double DRIVETRAIN_MULTIPLIER = 0.5f;
     private static int armPos = armMotor.getCurrentPosition();
-    private static int ARM_MAX = 1;
-    private static int ARM_MIN = -1;
+    private static int ARM_MAX = 100000;
+    private static int ARM_MIN = -100000;
     private static boolean IS_ARM_LOCKED = false;
     private static boolean IS_ARM_UP = false;
 
@@ -96,11 +96,17 @@ public class TeleOpALPHA extends OpMode {
                 armMotor.setPower(.5f);
             }
             IS_ARM_LOCKED = false;
+            IS_ARM_UP = false;
         } else {
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setTargetPosition(armPos);
-            armMotor.setPower(.5f);
+            if (IS_ARM_UP || !IS_ARM_LOCKED) {
+                armPos = armMotor.getCurrentPosition();
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setTargetPosition(armPos);
+                armMotor.setPower(.5f);
+            }
+
             IS_ARM_LOCKED = true;
+            IS_ARM_UP = false;
         }
 
         telemetry.addData("Arm Pos: ", armPos);
