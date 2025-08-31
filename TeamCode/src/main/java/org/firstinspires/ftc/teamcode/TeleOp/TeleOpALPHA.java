@@ -12,14 +12,18 @@ public class TeleOpALPHA extends OpMode {
     private static DcMotor rightFrontMotor;
     private static DcMotor leftBackMotor;
     private static DcMotor rightBackMotor;
+    private static DcMotor armMotor;
 
     private static double leftFrontSpeed;
     private static double leftBackSpeed;
     private static double rightFrontSpeed;
     private static double rightBackSpeed;
-
+    private static int armPos = armMotor.getCurrentPosition();
+    private static int ARM_MAX = 100000;
+    private static int ARM_MIN = -100000;
     private final static float DRIVETRAIN_MULTIPLIER = 0.5f;
-
+    private static boolean IS_ARM_LOCKED = false;
+    private static boolean IS_ARM_UP = false;
     @Override
     public void init() {
         rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
@@ -67,6 +71,31 @@ public class TeleOpALPHA extends OpMode {
         leftBackSpeed += gamepad1_x;
         rightFrontSpeed += gamepad1_x;
         rightBackSpeed -= gamepad1_x;
+
+        if(gamepad1.y){
+            if(!IS_ARM_UP){
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setTargetPosition(ARM_MAX);
+                armMotor.setPower(.5f);
+            }
+            IS_ARM_UP = true;
+            IS_ARM_LOCKED = false;
+        } else if (gamepad1.a) {
+            if(IS_ARM_UP || IS_ARM_LOCKED){
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setTargetPosition(ARM_MIN);
+                armMotor.setPower(.5f);
+            }
+            IS_ARM_LOCKED = false;
+        } else {
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotor.setTargetPosition(armPos);
+            armMotor.setPower(.5f);
+            IS_ARM_LOCKED = true;
+        }
+
+        telemetry.addData("Arm Pos: ", armPos);
+        telemetry.update();
 
         update();
     }
