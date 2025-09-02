@@ -12,6 +12,7 @@ public class TeleOpALPHA extends OpMode {
     private static DcMotor rightFrontMotor;
     private static DcMotor leftBackMotor;
     private static DcMotor rightBackMotor;
+    private static DcMotor armMotor;
 
     private static double leftFrontSpeed;
     private static double leftBackSpeed;
@@ -20,15 +21,24 @@ public class TeleOpALPHA extends OpMode {
 
     private static final float DRIVETRAIN_MULTIPLIER = 0.5f;
 
+    private static int armPos;
+    private static final int armMax = 10000;
+    private static final int armMin = -10000;
+    private static boolean isArmLocked = false;
+    private static boolean isArmUp = false;
+
     @Override
     public void init() {
         rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
         leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFrontMotor");
         rightBackMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
         leftBackMotor = hardwareMap.get(DcMotor.class, "leftBackMotor");
+        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
 
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public static void updateDrivetrainPower() {
         leftFrontMotor.setPower(leftFrontSpeed * DRIVETRAIN_MULTIPLIER);
@@ -50,6 +60,8 @@ public class TeleOpALPHA extends OpMode {
 
 //        ALL CODE GOES HERE!!!!
 
+//        DRIVETRAIN
+
 //       Rotate
         leftBackSpeed -= gamepad1_x2;
         leftFrontSpeed -= gamepad1_x2;
@@ -69,5 +81,36 @@ public class TeleOpALPHA extends OpMode {
         rightBackSpeed -= gamepad1_x;
 
         updateDrivetrainPower();
+
+//        ARM - ROBOT SPECIFIC
+
+        if (gamepad1.y) {
+            if (!isArmUp || isArmLocked) {
+                armMotor.setTargetPosition(armMax);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(0.8f);
+            }
+            isArmUp = true;
+            isArmLocked = false;
+        } else if (gamepad1.a) {
+            if (isArmUp || isArmLocked) {
+                armMotor.setTargetPosition(armMin);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(-0.8f);
+            }
+            isArmUp = false;
+            isArmLocked = false;
+        } else {
+            if (isArmUp || !isArmLocked) {
+                armMotor.setTargetPosition(armMotor.getCurrentPosition());
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                armMotor.setPower(1);
+            }
+            isArmUp = false;
+            isArmLocked = true;
+        }
+
+        telemetry.addData("armPos: ", armMotor.getCurrentPosition());
+        telemetry.update();
     }
 }
