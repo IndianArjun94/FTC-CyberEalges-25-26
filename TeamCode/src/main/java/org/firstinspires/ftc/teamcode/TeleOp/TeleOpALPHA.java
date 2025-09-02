@@ -18,7 +18,7 @@ public class TeleOpALPHA extends OpMode {
     private static double rightFrontSpeed;
     private static double rightBackSpeed;
 
-    private final static float DRIVETRAIN_MULTIPLIER = 0.5f;
+    private static final float DRIVETRAIN_MULTIPLIER = 0.5f;
 
     @Override
     public void init() {
@@ -30,7 +30,7 @@ public class TeleOpALPHA extends OpMode {
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
-    public static void update() {
+    public static void updateDrivetrainPower() {
         leftFrontMotor.setPower(leftFrontSpeed * DRIVETRAIN_MULTIPLIER);
         leftBackMotor.setPower(leftBackSpeed * DRIVETRAIN_MULTIPLIER);
         rightBackMotor.setPower(rightBackSpeed * DRIVETRAIN_MULTIPLIER);
@@ -68,6 +68,6 @@ public class TeleOpALPHA extends OpMode {
         rightFrontSpeed += gamepad1_x;
         rightBackSpeed -= gamepad1_x;
 
-        update();
+        updateDrivetrainPower();
     }
 }
