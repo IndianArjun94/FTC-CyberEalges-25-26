@@ -29,10 +29,10 @@ public class TeleOpALPHA extends OpMode {
 
     @Override
     public void init() {
-        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
-        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFrontMotor");
-        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
-        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBackMotor");
+        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFront");
+        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFront");
+        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBack");
+        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBack");
         armMotor = hardwareMap.get(DcMotor.class, "armMotor");
 
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
