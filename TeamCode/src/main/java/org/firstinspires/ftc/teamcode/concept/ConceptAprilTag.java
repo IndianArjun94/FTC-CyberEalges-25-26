@@ -71,7 +71,6 @@ import java.util.Objects;
 @TeleOp(name = "Concept: AprilTag", group = "Concept")
 //@Disabled
 public class ConceptAprilTag extends LinearOpMode {
-
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**
@@ -110,14 +109,14 @@ public class ConceptAprilTag extends LinearOpMode {
                 // Arjun stuff yay
 
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                telemetry.addLine("Identified:");
+                telemetry.addLine("\nIdentified:");
                 String pattern = "N/A";
 
                 for (AprilTagDetection detection : currentDetections) {
                     switch (detection.id) {
-                        case 21: pattern = setPatternTo(pattern, "G P P");
-                        case 22: pattern = setPatternTo(pattern, "P G P");
-                        case 23: pattern = setPatternTo(pattern, "P P G");
+                        case 21: pattern = setPatternTo(pattern, "G P P");break;
+                        case 22: pattern = setPatternTo(pattern, "P G P");break;
+                        case 23: pattern = setPatternTo(pattern, "P P G");break;
                     }
                 }
 

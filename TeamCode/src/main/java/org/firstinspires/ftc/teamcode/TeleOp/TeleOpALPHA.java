@@ -19,27 +19,29 @@ public class TeleOpALPHA extends OpMode {
     private static double rightFrontSpeed;
     private static double rightBackSpeed;
 
-    private static final float DRIVETRAIN_MULTIPLIER = 0.5f;
-
-    private static int armPos;
-    private static final int armMax = 10000;
-    private static final int armMin = -10000;
-    private static boolean isArmLocked = false;
-    private static boolean isArmUp = false;
+    private final static double DRIVETRAIN_MULTIPLIER = 0.5f;
+    private static int armPos = armMotor.getCurrentPosition();
+    private static int ARM_MAX = 100000;
+    private static int ARM_MIN = -100000;
+    private static boolean IS_ARM_LOCKED = false;
+    private static boolean IS_ARM_UP = false;
 
     @Override
     public void init() {
-        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFront");
-        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFront");
-        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBack");
-        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBack");
+        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
+        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFrontMotor");
+        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
+        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBackMotor");
         armMotor = hardwareMap.get(DcMotor.class, "armMotor");
 
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
+
+
+    //  Update Function that runs after every loop  //
     public static void updateDrivetrainPower() {
         leftFrontMotor.setPower(leftFrontSpeed * DRIVETRAIN_MULTIPLIER);
         leftBackMotor.setPower(leftBackSpeed * DRIVETRAIN_MULTIPLIER);
@@ -60,8 +62,6 @@ public class TeleOpALPHA extends OpMode {
 
 //        ALL CODE GOES HERE!!!!
 
-//        DRIVETRAIN
-
 //       Rotate
         leftBackSpeed -= gamepad1_x2;
         leftFrontSpeed -= gamepad1_x2;
@@ -80,37 +80,38 @@ public class TeleOpALPHA extends OpMode {
         rightFrontSpeed += gamepad1_x;
         rightBackSpeed -= gamepad1_x;
 
-        updateDrivetrainPower();
-
-//        ARM - ROBOT SPECIFIC
-
-        if (gamepad1.y) {
-            if (!isArmUp || isArmLocked) {
-                armMotor.setTargetPosition(armMax);
+//      Arm code        //
+        if(gamepad1.y){
+            if(!IS_ARM_UP){
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(0.8f);
+                armMotor.setTargetPosition(ARM_MAX);
+                armMotor.setPower(.5f);
             }
-            isArmUp = true;
-            isArmLocked = false;
+            IS_ARM_UP = true;
+            IS_ARM_LOCKED = false;
         } else if (gamepad1.a) {
-            if (isArmUp || isArmLocked) {
-                armMotor.setTargetPosition(armMin);
+            if(IS_ARM_UP || IS_ARM_LOCKED){
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(-0.8f);
+                armMotor.setTargetPosition(ARM_MIN);
+                armMotor.setPower(.5f);
             }
-            isArmUp = false;
-            isArmLocked = false;
+            IS_ARM_LOCKED = false;
+            IS_ARM_UP = false;
         } else {
-            if (isArmUp || !isArmLocked) {
-                armMotor.setTargetPosition(armMotor.getCurrentPosition());
+            if (IS_ARM_UP || !IS_ARM_LOCKED) {
+                armPos = armMotor.getCurrentPosition();
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setPower(1);
+                armMotor.setTargetPosition(armPos);
+                armMotor.setPower(.5f);
             }
-            isArmUp = false;
-            isArmLocked = true;
+
+            IS_ARM_LOCKED = true;
+            IS_ARM_UP = false;
         }
 
-        telemetry.addData("armPos: ", armMotor.getCurrentPosition());
+        telemetry.addData("Arm Pos: ", armPos);
         telemetry.update();
+//        Update Drivetrain Power
+        updateDrivetrainPower();
     }
 }
