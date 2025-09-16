@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode.concept;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -40,6 +42,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.Objects;
 
 /*
  * This OpMode illustrates the basics of AprilTag recognition and pose estimation,
@@ -81,6 +84,13 @@ public class ConceptAprilTag extends LinearOpMode {
      */
     private VisionPortal visionPortal;
 
+    private static String setPatternTo(String variable, String pattern) {
+        if (!Objects.equals(variable, "N/A")) {
+            return "Multiple Patterns Detected!";
+        }
+        return pattern;
+    }
+
     @Override
     public void runOpMode() {
 
@@ -97,8 +107,24 @@ public class ConceptAprilTag extends LinearOpMode {
 
                 telemetryAprilTag();
 
-                // Push telemetry to the Driver Station.
+                // Arjun stuff yay
+
+                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+                telemetry.addLine("Identified:");
+                String pattern = "N/A";
+
+                for (AprilTagDetection detection : currentDetections) {
+                    switch (detection.id) {
+                        case 21: pattern = setPatternTo(pattern, "G P P");
+                        case 22: pattern = setPatternTo(pattern, "P G P");
+                        case 23: pattern = setPatternTo(pattern, "P P G");
+                    }
+                }
+
+                telemetry.addData("Pattern: ", pattern);
+
                 telemetry.update();
+
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
@@ -189,6 +215,7 @@ public class ConceptAprilTag extends LinearOpMode {
     /**
      * Add telemetry about AprilTag detections.
      */
+    @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
