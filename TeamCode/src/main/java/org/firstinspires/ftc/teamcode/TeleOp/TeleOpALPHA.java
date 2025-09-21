@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.module.AprilTagModule;
+import org.firstinspires.ftc.teamcode.module.ObeliskPattern;
+
 @TeleOp(name = "TeleOpALPHA")
 public class TeleOpALPHA extends OpMode {
 
@@ -12,7 +15,7 @@ public class TeleOpALPHA extends OpMode {
     private static DcMotor rightFrontMotor;
     private static DcMotor leftBackMotor;
     private static DcMotor rightBackMotor;
-    private static DcMotor armMotor;
+//    private static DcMotor armMotor;
 
     private static double leftFrontSpeed;
     private static double leftBackSpeed;
@@ -20,7 +23,7 @@ public class TeleOpALPHA extends OpMode {
     private static double rightBackSpeed;
 
     private final static double DRIVETRAIN_MULTIPLIER = 0.5f;
-    private static int armPos = armMotor.getCurrentPosition();
+//    private static int armPos = armMotor.getCurrentPosition();
     private static int ARM_MAX = 100000;
     private static int ARM_MIN = -100000;
     private static boolean IS_ARM_LOCKED = false;
@@ -28,15 +31,17 @@ public class TeleOpALPHA extends OpMode {
 
     @Override
     public void init() {
-        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFrontMotor");
-        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFrontMotor");
-        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBackMotor");
-        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBackMotor");
-        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
+        rightFrontMotor = hardwareMap.get(DcMotor.class, "rightFront");
+        leftFrontMotor = hardwareMap.get(DcMotor.class, "leftFront");
+        rightBackMotor = hardwareMap.get(DcMotor.class, "rightBack");
+        leftBackMotor = hardwareMap.get(DcMotor.class, "leftBack");
+//        armMotor = hardwareMap.get(DcMotor.class, "armMotor");
 
         rightBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        AprilTagModule.init(hardwareMap, true);
 
     }
 
@@ -80,37 +85,53 @@ public class TeleOpALPHA extends OpMode {
         rightFrontSpeed += gamepad1_x;
         rightBackSpeed -= gamepad1_x;
 
-//      Arm code        //
-        if(gamepad1.y){
-            if(!IS_ARM_UP){
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setTargetPosition(ARM_MAX);
-                armMotor.setPower(.5f);
-            }
-            IS_ARM_UP = true;
-            IS_ARM_LOCKED = false;
-        } else if (gamepad1.a) {
-            if(IS_ARM_UP || IS_ARM_LOCKED){
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setTargetPosition(ARM_MIN);
-                armMotor.setPower(.5f);
-            }
-            IS_ARM_LOCKED = false;
-            IS_ARM_UP = false;
-        } else {
-            if (IS_ARM_UP || !IS_ARM_LOCKED) {
-                armPos = armMotor.getCurrentPosition();
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armMotor.setTargetPosition(armPos);
-                armMotor.setPower(.5f);
-            }
+        ObeliskPattern obeliskPattern = AprilTagModule.instance.getObeliskPattern();
 
-            IS_ARM_LOCKED = true;
-            IS_ARM_UP = false;
+        if (obeliskPattern == ObeliskPattern.GPP) {
+            telemetry.addData("Pattern: ", "GPP");
+        } else if (obeliskPattern == ObeliskPattern.PGP) {
+            telemetry.addData("Pattern: ", "PGP");
+        } else if (obeliskPattern == ObeliskPattern.PPG) {
+            telemetry.addData("Pattern: ", "PPG");
+        } else if (obeliskPattern == ObeliskPattern.NONE_DETECTED) {
+            telemetry.addData("Pattern: ", "");
+        } else if (obeliskPattern == ObeliskPattern.MULTIPLE_DETECTED) {
+            telemetry.addData("Pattern: ", "multiple");
         }
 
-        telemetry.addData("Arm Pos: ", armPos);
         telemetry.update();
+
+//      Arm code        //
+//        if(gamepad1.y){
+//            if(!IS_ARM_UP){
+//                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                armMotor.setTargetPosition(ARM_MAX);
+//                armMotor.setPower(.5f);
+//            }
+//            IS_ARM_UP = true;
+//            IS_ARM_LOCKED = false;
+//        } else if (gamepad1.a) {
+//            if(IS_ARM_UP || IS_ARM_LOCKED){
+//                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                armMotor.setTargetPosition(ARM_MIN);
+//                armMotor.setPower(.5f);
+//            }
+//            IS_ARM_LOCKED = false;
+//            IS_ARM_UP = false;
+//        } else {
+//            if (IS_ARM_UP || !IS_ARM_LOCKED) {
+//                armPos = armMotor.getCurrentPosition();
+//                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                armMotor.setTargetPosition(armPos);
+//                armMotor.setPower(.5f);
+//            }
+//
+//            IS_ARM_LOCKED = true;
+//            IS_ARM_UP = false;
+//        }
+//
+//        telemetry.addData("Arm Pos: ", armPos);
+//        telemetry.update();
 //        Update Drivetrain Power
         updateDrivetrainPower();
     }
